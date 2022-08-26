@@ -3,9 +3,8 @@ package com.example.demo
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
-@SpringBootApplication
-class ReturnApplication
+@SpringBootApplication class ReturnApplication
 
 fun main(args: Array<String>) {
-	runApplication<ReturnApplication>(*args)
+    runApplication<ReturnApplication>(*args)
 }
