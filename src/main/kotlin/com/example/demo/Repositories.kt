@@ -14,6 +14,6 @@ interface ReturnOrderItemRepository : CrudRepository<ReturnOrderItem, String> {
     fun findByEmailAndOrderId(email: String, orderId: String): List<ReturnOrderItem>
 }
 
-interface OrderRepository : CrudRepository<RecordOrder, String> {
+interface RecordOrderRepository : CrudRepository<RecordOrder, String> {
     fun findByEmailAndOrderId(email: String, orderId: String): List<RecordOrder>
 }

@@ -14,7 +14,7 @@ constructor(
         val entityManager: TestEntityManager,
         val pendingTokenRepository: PendingTokenRepository,
         val returnOrderItemRepository: ReturnOrderItemRepository,
-        val orderRepository: OrderRepository,
+        val recordOrderRepository: RecordOrderRepository,
 ) {
 
     @Test
@@ -121,13 +121,21 @@ constructor(
     fun `When OrderRepository findByEmailAndOrderId then return List Order`() {
         val orders: List<RecordOrder> =
                 listOf(
-                        RecordOrder("1", "Order1", "user@email.com", "SHR1", 1, 10.00, "blue shirt"),
+                        RecordOrder(
+                                "1",
+                                "Order1",
+                                "user@email.com",
+                                "SHR1",
+                                1,
+                                10.00,
+                                "blue shirt"
+                        ),
                         RecordOrder("2", "Order1", "user@email.com", "SHR2", 1, 10.00, "red shirt"),
-                        )
+                )
         for (i in orders) entityManager.persist(i)
         entityManager.flush()
         val found =
-                orderRepository.findByEmailAndOrderId(
+                recordOrderRepository.findByEmailAndOrderId(
                         orders.elementAt(0).email,
                         orders.elementAt(0).orderId
                 )
