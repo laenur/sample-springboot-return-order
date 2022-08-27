@@ -3,7 +3,7 @@
 Sample project of spring boot using kotlin creating REST server for order item returns management.
 
 # Getting Started
-1. `./gradlew bootRun
+1. `./gradlew bootRun`
 
 # Curl Collection
 
