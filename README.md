@@ -5,6 +5,10 @@ Sample project of spring boot using kotlin creating REST server for order item r
 # Getting Started
 1. `./gradlew bootRun`
 
+# Docs
+- requirement: `REQUIREMENT.md`
+- case to test: `CASE.md`
+
 # Curl Collection
 
 ## upload csv
@@ -13,7 +17,7 @@ Sample project of spring boot using kotlin creating REST server for order item r
 
 ## generate returns token
 
-`curl -X POST --location "http://localhost:8080/pending/returns" -H "Content-Type: application/json" -d "{ \"orderId\": \"RK-478\", \"email\": \"john@example.com\" }"`
+`curl -X POST --location "http://localhost:8080/pending/returns" -H "Content-Type: application/json" -d "{ \"orderId\": \"RK-238\", \"email\": \"carly@example.com\" }"`
 
 ## return order
 
@@ -46,3 +50,10 @@ param:
 - quantity: int >= 0
   
 `curl -X PUT --location "http://localhost:8080/returns/{{returnOrderId}}/items/{{returnOrderItemId}}/qc/quantity" -H "Content-Type: application/json" -d "{ \"quantity\": {{quantity}} }"`
+
+## complete return order
+
+param:
+- returnOrderId: from `check status`
+  
+`curl -X GET --location "http://localhost:8080/returns/{{returnOrderId}}/complete" -H "Content-Type: application/json"`
