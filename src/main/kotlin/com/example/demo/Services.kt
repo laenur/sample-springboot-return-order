@@ -47,7 +47,6 @@ class ReturnOrderService(
                         pendingReturn.email,
                         pendingReturn.orderId
                 )
-        println(items.size)
 
         val returnOrder = ReturnOrder(ULID.random(), 0.00, "AWAITING_APPROVAL")
         for (item in items) {
@@ -69,6 +68,7 @@ class ReturnOrderService(
         }
 
         returnOrderRepository.save(returnOrder)
+        pendingTokenRepository.delete(pendingReturn)
         return returnOrder
     }
 
@@ -163,7 +163,6 @@ class CsvService(val recordOrderRepository: RecordOrderRepository) {
                 }
             }
         } catch (ex: Exception) {
-            print(ex)
             throw Exception("Error during csv import")
         } finally {
             closeFileReader(fileReader)
