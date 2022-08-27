@@ -20,7 +20,7 @@ Sample project of spring boot using kotlin creating REST server for order item r
 param:
 - token: from `generate returns token`
 
-`curl -X POST --location "http://localhost:8080/returns" -H "Content-Type: application/json" -d "{ \"token\": \"{token}\" }" | jq`
+`curl -X POST --location "http://localhost:8080/returns" -H "Content-Type: application/json" -d "{ \"token\": \"{{token}}\" }" | jq`
 
 ## check status
 
