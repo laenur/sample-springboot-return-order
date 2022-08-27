@@ -64,6 +64,11 @@ class ReturnController(
         )
     }
 
+    @GetMapping("/returns/{returnOrderId}/complete")
+    fun completeReturnOrder(@PathVariable returnOrderId: String) {
+        return returnOrderService.completeReturnOrder(returnOrderId)
+    }
+
     @PostMapping("/upload-order-csv")
     fun uploadCsvFile(@RequestParam("file") file: MultipartFile) {
         csvService.uploadCsvFile(file)

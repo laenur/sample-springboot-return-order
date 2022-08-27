@@ -78,18 +78,20 @@ class ReturnOrderService(
     }
 
     fun updateItemStatus(returnOrderId: String, returnOrderItemId: String, status: String) {
+        if (status != "ACCEPTED" && status != "REJECTED") {
+            throw Exception("Invalid status: ACCEPTED or REJECTED only")
+        }
         val existedReturnOrder = returnOrderRepository.findById(returnOrderId).get()
 
         val items = existedReturnOrder.returnOrderItems
         var item: ReturnOrderItem? = null
 
-        var everyThingUpdated = true
-
+        var amount: Double = 0.00
         for (i in items) {
             if (i.id == returnOrderItemId) {
                 item = i
-            } else if (i.status == "AWAITING_APPROVAL" && everyThingUpdated) {
-                everyThingUpdated = false
+            } else if (i.status == "ACCEPTED" || i.status == "AWAITING_APPROVAL") {
+                amount += i.price * i.quantity
             }
         }
 
@@ -97,9 +99,23 @@ class ReturnOrderService(
             throw Exception("Item not found")
         }
 
+        if (status == "ACCEPTED") {
+            val existedReturnOrderItem = returnOrderItemRepository.findByEmailAndOrderId(item.email, item.orderId)
+            var alreadyProcessed = false
+            for (i in existedReturnOrderItem) {
+                if (i.status != "AWAITING_APPROVAL" && i.id == returnOrderItemId) {
+                    alreadyProcessed = true
+                    break
+                }
+            }
+            if (alreadyProcessed) {
+                throw Exception("Item already returned once")
+            }
+        }
+
         item.status = status
-        if (item.status == "REJECTED") existedReturnOrder.amount -= item.quantity * item.price
-        if (everyThingUpdated) existedReturnOrder.status = "COMPLETE"
+        if (item.status == "ACCEPTED") amount += item.quantity * item.price
+        existedReturnOrder.amount = amount
 
         returnOrderRepository.save(existedReturnOrder)
         returnOrderItemRepository.save(item)
@@ -108,7 +124,13 @@ class ReturnOrderService(
     }
 
     fun updateItemQuantity(returnOrderId: String, returnOrderItemId: String, quantity: Int) {
+        if (quantity < 0) {
+            throw Exception("Invalid quantity")
+        }
         val existedReturnOrder = returnOrderRepository.findById(returnOrderId).get()
+        if (existedReturnOrder.status == "COMPLETED") {
+            throw Exception("This return status already completed")
+        }
 
         val items = existedReturnOrder.returnOrderItems
         var item: ReturnOrderItem? = null
@@ -116,6 +138,7 @@ class ReturnOrderService(
         for (i in items) {
             if (i.id == returnOrderItemId) {
                 item = i
+                break
             }
         }
 
@@ -123,13 +146,43 @@ class ReturnOrderService(
             throw Exception("Item not found")
         }
 
-        existedReturnOrder.amount -= item.quantity * item.price
-        existedReturnOrder.amount += quantity * item.price
+        val originalOrder = recordOrderRepository.findById(item.orderId+item.email+item.sku).get()
+        if (quantity > originalOrder.quantity) {
+            throw Exception("Quantity not match")
+        }
+
+        if (item.status == "ACCEPTED" || item.status == "AWAITING_APPROVAL") {
+            existedReturnOrder.amount -= item.quantity * item.price
+            existedReturnOrder.amount += quantity * item.price
+        }
         item.quantity = quantity
 
         returnOrderRepository.save(existedReturnOrder)
         returnOrderItemRepository.save(item)
 
+        return
+    }
+
+    fun completeReturnOrder(returnOrderId: String) {
+        val existedReturnOrder = returnOrderRepository.findById(returnOrderId).get()
+        if (existedReturnOrder.status == "COMPLETED") {
+            throw Exception("This return status already completed")
+        }
+
+        val items = existedReturnOrder.returnOrderItems
+        var everyThingUpdated = true
+        for (i in items) {
+            if (i.status == "AWAITING_APPROVAL") {
+                everyThingUpdated = false
+                break
+            }
+        }
+
+        if (!everyThingUpdated) {
+            throw Exception("Some item not yet reviewed")
+        }
+        existedReturnOrder.status = "COMPLETED"
+        returnOrderRepository.save(existedReturnOrder)
         return
     }
 }
