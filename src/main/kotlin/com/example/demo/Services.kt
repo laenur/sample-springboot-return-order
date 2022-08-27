@@ -50,31 +50,25 @@ class ReturnOrderService(
         println(items.size)
 
         val returnOrder = ReturnOrder(ULID.random(), 0.00, "AWAITING_APPROVAL")
-        var returnOrderItems: MutableList<ReturnOrderItem> = mutableListOf()
         for (item in items) {
             returnOrder.amount += item.price * item.quantity
-            returnOrderItems.add(
-                    ReturnOrderItem(
-                            ULID.random(),
-                            returnOrder,
-                            item.orderId,
-                            item.email,
-                            false,
-                            item.quantity,
-                            item.price,
-                            item.itemName,
-                            item.sku,
-                            "AWAITING_APPROVAL"
-                    )
+            returnOrder.addReturnOrderItem(
+                ReturnOrderItem(
+                    ULID.random(),
+                    returnOrder.id,
+                    item.orderId,
+                    item.email,
+                    false,
+                    item.quantity,
+                    item.price,
+                    item.itemName,
+                    item.sku,
+                    "AWAITING_APPROVAL"
+                )
             )
         }
 
         returnOrderRepository.save(returnOrder)
-        for (item in returnOrderItems) {
-            returnOrderItemRepository.save(item)
-            item.returnOrder = ReturnOrder(returnOrder.id, returnOrder.amount, returnOrder.status)
-            returnOrder.addReturnOrderItem(item)
-        }
         return returnOrder
     }
 

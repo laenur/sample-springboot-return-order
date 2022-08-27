@@ -11,7 +11,7 @@ class PendingToken(
 
 @Entity
 class ReturnOrder(@Id var id: String, var amount: Double, var status: String) {
-        @OneToMany(mappedBy = "returnOrder")
+        @OneToMany(cascade = arrayOf(CascadeType.ALL), fetch = FetchType.LAZY, orphanRemoval = true)
         private var _returnOrderItems = mutableListOf<ReturnOrderItem>()
 
         val returnOrderItems
@@ -25,7 +25,7 @@ class ReturnOrder(@Id var id: String, var amount: Double, var status: String) {
 @Entity
 class ReturnOrderItem(
                 @Id var id: String,
-                @ManyToOne var returnOrder: ReturnOrder,
+                var returnOrderId: String,
                 var orderId: String,
                 var email: String,
                 var isQualityControlled: Boolean,
